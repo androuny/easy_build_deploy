@@ -3,7 +3,7 @@ use serde_json;
 use std::fs::File;
 use std::io::{BufReader, Read};
 use reqwest::blocking::{Client};
-use reqwest::header::{HeaderName, CONTENT_DISPOSITION};
+use reqwest::header::{HeaderName};
 use serde_json::{json};
 use std::path::Path;
 use std::io::Write;
@@ -46,7 +46,7 @@ fn deploy_file(filepath: &str, access_token: &str, api_url: &str, filename: &str
     // Read file into base64 UTF-8 string
     let mut contents = File::open(filepath).expect("Failed to read deployable binary.");
     let mut buffer = Vec::new();
-    contents.read_to_end(&mut buffer);
+    contents.read_to_end(&mut buffer).unwrap();
     let base64_contents = base64::encode(buffer);
     println!("base64 string len: {}", base64_contents.len());
     let body = json!({
@@ -59,7 +59,7 @@ fn deploy_file(filepath: &str, access_token: &str, api_url: &str, filename: &str
     //let auth_header = Authorization(Bearer { token: access_token.to_owned() });
     let mut headers = reqwest::header::HeaderMap::new();
     let name: HeaderName = "Authorization".parse().unwrap();
-    let mut token_string = format!("Bearer {}", access_token);
+    let token_string = format!("Bearer {}", access_token);
     headers.insert(name, token_string.parse().unwrap());
 
 
