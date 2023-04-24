@@ -42,13 +42,30 @@ fn init_config() -> Config{
     
 }
 
+fn format_bytes(bytes: u64) -> String {
+    if bytes < 1024 {
+        return format!("{} B", bytes);
+    }
+
+    let units = ["KB", "MB", "GB", "TB"];
+    let mut size = bytes as f64 / 1024.0;
+    let mut unit = 0;
+
+    while size > 1024.0 {
+        size /= 1024.0;
+        unit += 1;
+    }
+
+    format!("{:.2} {}", size, units[unit])
+}
+
 fn deploy_file(filepath: &str, access_token: &str, api_url: &str, filename: &str) {
     // Read file into base64 UTF-8 string
     let mut contents = File::open(filepath).expect("Failed to read deployable binary.");
     let mut buffer = Vec::new();
     contents.read_to_end(&mut buffer).unwrap();
     let base64_contents = base64::encode(buffer);
-    println!("base64 string len: {}", base64_contents.len());
+    println!("base64 string len: {} bytes - {}", base64_contents.len(), format_bytes(base64_contents.len() as u64));
     let body = json!({
         "file": base64_contents,
         "filename" : filename
